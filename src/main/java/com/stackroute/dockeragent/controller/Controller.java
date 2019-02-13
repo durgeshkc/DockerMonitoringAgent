@@ -18,18 +18,18 @@ import java.util.List;
 @RequestMapping("/docker")
 public class Controller {
 
-    @Autowired
-    private Metrics metrics;
+//    @Autowired
+//    private Metrics metrics;
 
-    public Controller(Metrics metrics) {
-        this.metrics = metrics;
-    }
+//    @Autowired
+//    public Controller(Metrics metrics) {
+//        this.metrics = metrics;
+//    }
 
     @GetMapping("/stats")
     public ResponseEntity<?> getMetrics() throws IOException
     {
 
-        List<Metrics> metricsList = new ArrayList<>();
         List<String> commands = new ArrayList<String>();
         commands.add("/bin/sh");
         commands.add("-c");
@@ -47,17 +47,23 @@ public class Controller {
         String temp="";
 
         int f=0;
-        System.out.println("here is the string array");
+        List<Metrics> metricsList = new ArrayList<>();
+
+//        System.out.println("here is the string array");
         while ((s = stdInput.readLine()) != null)
         {
+
             temp =temp+s+"\n";
 
             if (f>=1)
             {
+                Metrics metrics = new Metrics();
+
                 String[] str =s.trim().split("\\s+");
-                for(int i=0;i<str.length;i++)
-                {
-                    //System.out.println(str[i]);
+//                System.out.println("String[] : " + str);
+//                System.out.println("length ==="+str.length);
+
+                  //  System.out.println(str[i]);
                     metrics.setContainerId(str[0]);
                     metrics.setContainerName(str[1]);
                     metrics.setCpu(str[2]);
@@ -65,14 +71,18 @@ public class Controller {
                     metrics.setNetIO(str[7]+str[8]+str[9]);
                     metrics.setBlockIO(str[10]+str[10]+str[12]);
                     metrics.setpId(str[13]);
-                }
+                //System.out.println("Metrics : " + metrics.toString());
                 metricsList.add(metrics);
             }
             f++;
-        }
 
-        System.out.println(metrics.toString());
-        return new ResponseEntity<>(metricsList, HttpStatus.OK);
+            //System.out.println("jjjjjjjjjjjjjjjjjjjjjjjjjj");
+        }
+//        System.out.println(metricsList.toString());
+        for(Metrics model : metricsList) {
+            System.out.println(model);
+        }
+        return new ResponseEntity<List<Metrics>>(metricsList, HttpStatus.OK);
     }
 
 }

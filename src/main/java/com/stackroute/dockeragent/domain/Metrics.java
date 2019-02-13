@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class Metrics {
 
 
-    private  String containerId;
+    private String containerId;
     private String containerName;
     private String cpu;
     private String mem;
