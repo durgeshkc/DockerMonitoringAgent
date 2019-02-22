@@ -32,7 +32,7 @@ public class Controller {
 
         commands1.add("/bin/sh");
         commands1.add("-c");
-        commands1.add("docker ps --quiet"); // command
+        commands1.add("docker ps --quiet"); // command to get list of docker container IDs.
 
         ProcessBuilder pb1 = new ProcessBuilder(commands1);
         Process process1 = pb1.start();
@@ -52,7 +52,7 @@ public class Controller {
 
             commands2.add("/bin/sh");
             commands2.add("-c");
-            commands2.add("docker port "+newmodel.getContainerId());
+            commands2.add("docker port "+newmodel.getContainerId());    //command to get port number of a particular container ID.
 
             ProcessBuilder pb2 = new ProcessBuilder(commands2);
 
@@ -61,28 +61,20 @@ public class Controller {
             BufferedReader stdInput2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
 
 
-            // System.out.println(stdInput2.readLine());
-
             while ((s2 = stdInput2.readLine()) != null) {
-
-                System.out.println("Hello123");
-
                 String[] str2 =s2.trim().split(":");
                 newmodel.setPort(str2[1]);
             }
 
-
             System.out.println(newmodel.getContainerId() + newmodel.getContainerName() + newmodel.getPort());
         }
-
-
 
         /********************************************************************************************88*/
 
         List<String> commands = new ArrayList<String>();
         commands.add("/bin/sh");
         commands.add("-c");
-        commands.add("docker stats --no-stream"); // command
+        commands.add("docker stats --no-stream"); // command to get performance metrics details of docker container
 
         // creating the process
         ProcessBuilder pb = new ProcessBuilder(commands);
@@ -99,8 +91,6 @@ public class Controller {
 
         while ((s = stdInput.readLine()) != null)
         {
-
-
             temp =temp+s+"\n";
 
             if (f>=1)
@@ -129,15 +119,10 @@ public class Controller {
                     }
 
                 }
-
-
-                   metricsList.add(metrics);
-
+                metricsList.add(metrics);
             }
             f++;
         }
-
-
 
 
         for(Metrics model : metricsList) {
