@@ -1,5 +1,6 @@
 package com.stackroute.dockeragent.controller;
 
+import com.stackroute.dockeragent.domain.ContainerDetails;
 import com.stackroute.dockeragent.domain.Metrics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,23 +13,71 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
 @RequestMapping("/docker")
 public class Controller {
 
-//    @Autowired
-//    private Metrics metrics;
-
-//    @Autowired
-//    public Controller(Metrics metrics) {
-//        this.metrics = metrics;
-//    }
-
     @GetMapping("/stats")
     public ResponseEntity<?> getMetrics() throws IOException
     {
+        String s1 = null;
+        String s = null;
+        String s2 =null;
+        String temp="";
+        String temp2 = "";
+        List<String> commands1 = new ArrayList<>();
+
+        commands1.add("/bin/sh");
+        commands1.add("-c");
+        commands1.add("docker ps --quiet"); // command
+
+        ProcessBuilder pb1 = new ProcessBuilder(commands1);
+        Process process1 = pb1.start();
+        BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(process1.getInputStream()));
+
+        List<ContainerDetails> containerDetailsList1 = new ArrayList<>();
+
+        while((s1 = stdInput1.readLine()) != null){
+            ContainerDetails containerDetails1 = new ContainerDetails();
+            containerDetails1.setContainerId(s1);
+            containerDetailsList1.add(containerDetails1);
+        }
+
+        for(ContainerDetails newmodel : containerDetailsList1) {
+            System.out.println(newmodel.getContainerId());
+            List<String> commands2 = new ArrayList<String>();
+
+            commands2.add("/bin/sh");
+            commands2.add("-c");
+            commands2.add("docker port "+newmodel.getContainerId());
+
+            ProcessBuilder pb2 = new ProcessBuilder(commands2);
+
+            // starting the process
+            Process process2 = pb2.start();
+            BufferedReader stdInput2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
+
+
+            // System.out.println(stdInput2.readLine());
+
+            while ((s2 = stdInput2.readLine()) != null) {
+
+                System.out.println("Hello123");
+
+                String[] str2 =s2.trim().split(":");
+                newmodel.setPort(str2[1]);
+            }
+
+
+            System.out.println(newmodel.getContainerId() + newmodel.getContainerName() + newmodel.getPort());
+        }
+
+
+
+        /********************************************************************************************88*/
 
         List<String> commands = new ArrayList<String>();
         commands.add("/bin/sh");
@@ -41,29 +90,27 @@ public class Controller {
         // starting the process
         Process process = pb.start();
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//        System.out.println(stdInput.readLine());
 
-        String s = null;
-        String temp="";
 
         int f=0;
         List<Metrics> metricsList = new ArrayList<>();
 
-//        System.out.println("here is the string array");
+
+
         while ((s = stdInput.readLine()) != null)
         {
+
 
             temp =temp+s+"\n";
 
             if (f>=1)
             {
+
                 Metrics metrics = new Metrics();
 
                 String[] str =s.trim().split("\\s+");
-//                System.out.println("String[] : " + str);
-//                System.out.println("length ==="+str.length);
 
-                  //  System.out.println(str[i]);
+
                     metrics.setContainerId(str[0]);
                     metrics.setContainerName(str[1]);
                     metrics.setCpu(str[2]);
@@ -71,14 +118,28 @@ public class Controller {
                     metrics.setNetIO(str[7]+str[8]+str[9]);
                     metrics.setBlockIO(str[10]+str[10]+str[12]);
                     metrics.setpId(str[13]);
-                //System.out.println("Metrics : " + metrics.toString());
-                metricsList.add(metrics);
+
+                Iterator iterator = containerDetailsList1.iterator();
+                while (iterator.hasNext()){
+                    System.out.println("Inside Iterator");
+                    ContainerDetails newContainerDetails = (ContainerDetails) iterator.next();
+                    if(str[0].equals(newContainerDetails.getContainerId())){
+                        System.out.println(newContainerDetails.getPort() + "########");
+                        metrics.setPort(newContainerDetails.getPort());
+                    }
+
+                }
+
+
+                   metricsList.add(metrics);
+
             }
             f++;
-
-            //System.out.println("jjjjjjjjjjjjjjjjjjjjjjjjjj");
         }
-//        System.out.println(metricsList.toString());
+
+
+
+
         for(Metrics model : metricsList) {
             System.out.println(model);
         }
@@ -86,17 +147,3 @@ public class Controller {
     }
 
 }
-//        01ba60de2082
-//        elegant_mclaren
-//        5.04%
-//        1.985GiB
-//        /
-//        15.54GiB
-//        12.77%
-//        807MB
-//        /
-//        809MB
-//        9.49MB
-//        /
-//        1.32GB
-//        307

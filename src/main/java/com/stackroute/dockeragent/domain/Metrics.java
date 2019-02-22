@@ -1,10 +1,6 @@
 package com.stackroute.dockeragent.domain;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class Metrics {
-
 
     private String containerId;
     private String containerName;
@@ -13,6 +9,8 @@ public class Metrics {
     private String netIO;
     private String blockIO;
     private String pId;
+    private String port;
+
 
 
     public String getContainerId() {
@@ -48,6 +46,15 @@ public class Metrics {
     }
 
 
+    public String getPort() {
+
+
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
 
     public Metrics() {
     }
@@ -77,6 +84,20 @@ public class Metrics {
     }
 
 
+//    @Override
+//    public String toString() {
+//        return "Metrics{" +
+//                "containerId='" + containerId + '\'' +
+//                ", containerName='" + containerName + '\'' +
+//                ", cpu='" + cpu + '\'' +
+//                ", mem='" + mem + '\'' +
+//                ", netIO='" + netIO + '\'' +
+//                ", blockIO='" + blockIO + '\'' +
+//                ", pId='" + pId + '\'' +
+//                '}';
+//    }
+
+
     @Override
     public String toString() {
         return "Metrics{" +
@@ -87,6 +108,7 @@ public class Metrics {
                 ", netIO='" + netIO + '\'' +
                 ", blockIO='" + blockIO + '\'' +
                 ", pId='" + pId + '\'' +
+                ", port='" + port + '\'' +
                 '}';
     }
 }
